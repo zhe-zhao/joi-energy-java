@@ -20,12 +20,20 @@ public class MeterReadingsBuilder {
     }
 
     public MeterReadingsBuilder generateElectricityReadings() {
-        return generateElectricityReadings(5);
+        return generateElectricityReadings(5, -1);
     }
 
     public MeterReadingsBuilder generateElectricityReadings(int number) {
+        return generateElectricityReadings(number, -1);
+    }
+
+    public MeterReadingsBuilder generateElectricityReadings(double readingVal) {
+        return generateElectricityReadings(5, readingVal);
+    }
+
+    public MeterReadingsBuilder generateElectricityReadings(int number, double readingVal) {
         ElectricityReadingsGenerator readingsBuilder = new ElectricityReadingsGenerator();
-        this.electricityReadings = readingsBuilder.generate(number);
+        this.electricityReadings = readingsBuilder.generate(number, readingVal);
         return this;
     }
 

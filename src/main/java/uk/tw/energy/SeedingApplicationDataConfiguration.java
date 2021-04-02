@@ -40,7 +40,7 @@ public class SeedingApplicationDataConfiguration {
         final ElectricityReadingsGenerator electricityReadingsGenerator = new ElectricityReadingsGenerator();
         smartMeterToPricePlanAccounts()
                 .keySet()
-                .forEach(smartMeterId -> readings.put(smartMeterId, electricityReadingsGenerator.generate(20)));
+                .forEach(smartMeterId -> readings.put(smartMeterId, electricityReadingsGenerator.generate(20, -1)));
         return readings;
     }
 

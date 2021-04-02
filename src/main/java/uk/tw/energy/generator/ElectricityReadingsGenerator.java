@@ -13,6 +13,10 @@ import java.util.Random;
 public class ElectricityReadingsGenerator {
 
     public List<ElectricityReading> generate(int number, double readingVal) {
+        return generate(number, readingVal, 10);
+    }
+
+    public List<ElectricityReading> generate(int number, double readingVal, int interval) {
         List<ElectricityReading> readings = new ArrayList<>();
         Instant now = Instant.now();
 
@@ -20,7 +24,7 @@ public class ElectricityReadingsGenerator {
         for (int i = 0; i < number; i++) {
             double positiveReadingVal = readingVal >=0 ? readingVal: readingRandomiser.nextGaussian();
             BigDecimal reading = BigDecimal.valueOf(positiveReadingVal).setScale(4, RoundingMode.CEILING);
-            ElectricityReading electricityReading = new ElectricityReading(now.minusSeconds(i * 10), reading);
+            ElectricityReading electricityReading = new ElectricityReading(now.minusSeconds(i * interval), reading);
             readings.add(electricityReading);
         }
 

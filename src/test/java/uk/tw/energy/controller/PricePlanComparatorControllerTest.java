@@ -11,15 +11,13 @@ import uk.tw.energy.service.PricePlanService;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.tw.energy.controller.PricePlanComparatorController.PREV_WEEK_COST_KEY;
 
 public class PricePlanComparatorControllerTest {
 
@@ -74,17 +72,13 @@ public class PricePlanComparatorControllerTest {
         int secondsInOneWeek = 3600 * 24 * 7;
         ElectricityReading readingPrevWeek1 = new ElectricityReading(now.minusSeconds(secondsInOneWeek), BigDecimal.valueOf(3.0));
         ElectricityReading readingPrevWeek2 = new ElectricityReading(now.minusSeconds(secondsInOneWeek + 3600), BigDecimal.valueOf(5.0));
-        meterReadingService.storeReadings(SMART_METER_ID, Arrays.asList(readingCurrentWeek1, readingCurrentWeek2, readingPrevWeek1, readingPrevWeek2));
+        meterReadingService
+                .storeReadings(SMART_METER_ID, Arrays.asList(readingCurrentWeek1, readingCurrentWeek2, readingPrevWeek1, readingPrevWeek2));
 
-        Map<String, BigDecimal> expectedPricePlanToCost = new HashMap<>();
-        expectedPricePlanToCost.put(PRICE_PLAN_1_ID, BigDecimal.valueOf(40.0).setScale(3));
-        expectedPricePlanToCost.put(PRICE_PLAN_2_ID, BigDecimal.valueOf(4.0).setScale(3));
-        expectedPricePlanToCost.put(PRICE_PLAN_3_ID, BigDecimal.valueOf(8.0).setScale(3));
-
-        Map<String, Object> expected = new HashMap<>();
-        expected.put(PricePlanComparatorController.PRICE_PLAN_ID_KEY, PRICE_PLAN_1_ID);
-        expected.put(PricePlanComparatorController.PRICE_PLAN_COMPARISONS_KEY, expectedPricePlanToCost);
-        assertThat(controller.calculatedPrevNatualWeekCostForEachPricePlan(SMART_METER_ID).getBody()).isEqualTo(expected);
+        Map<String, Object> expected = Stream.of(new String[][]{
+                {PricePlanComparatorController.PRICE_PLAN_ID_KEY, PRICE_PLAN_1_ID},
+                {PREV_WEEK_COST_KEY, BigDecimal.valueOf(40.0).setScale(3).toString()}
+        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
         assertEquals(expected, controller.calculatedPrevNatualWeekCostForEachPricePlan((SMART_METER_ID)).getBody());
     }
 

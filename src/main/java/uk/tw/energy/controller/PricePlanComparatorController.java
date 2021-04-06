@@ -22,6 +22,7 @@ import java.util.Optional;
 public class PricePlanComparatorController {
 
     public final static String PRICE_PLAN_ID_KEY = "pricePlanId";
+    public final static String PREV_WEEK_COST_KEY = "prevWeekCost";
     public final static String PRICE_PLAN_COMPARISONS_KEY = "pricePlanComparisons";
     private final PricePlanService pricePlanService;
     private final AccountService accountService;
@@ -60,12 +61,12 @@ public class PricePlanComparatorController {
             return ResponseEntity.notFound().build();
         }
 
-        Map<String, Object> pricePlanComparisons = new HashMap<>();
-        pricePlanComparisons.put(PRICE_PLAN_ID_KEY, pricePlanId);
-        pricePlanComparisons.put(PRICE_PLAN_COMPARISONS_KEY, consumptionsForPricePlans.get());
+        Map<String, Object> prevWeekCostSummary = new HashMap<>();
+        prevWeekCostSummary.put(PRICE_PLAN_ID_KEY, pricePlanId);
+        prevWeekCostSummary.put(PREV_WEEK_COST_KEY, consumptionsForPricePlans.get().get(pricePlanId).toString());
 
         return consumptionsForPricePlans.isPresent()
-                ? ResponseEntity.ok(pricePlanComparisons)
+                ? ResponseEntity.ok(prevWeekCostSummary)
                 : ResponseEntity.notFound().build();
     }
 

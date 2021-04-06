@@ -17,14 +17,17 @@ public class ElectricityReadingsGenerator {
     }
 
     public List<ElectricityReading> generate(int number, double readingVal, int interval) {
+        return generate(number, readingVal, interval, Instant.now());
+    }
+
+    public List<ElectricityReading> generate(int number, double readingVal, int interval, Instant startBackward) {
         List<ElectricityReading> readings = new ArrayList<>();
-        Instant now = Instant.now();
 
         Random readingRandomiser = new Random();
         for (int i = 0; i < number; i++) {
             double positiveReadingVal = readingVal >=0 ? readingVal: readingRandomiser.nextGaussian();
             BigDecimal reading = BigDecimal.valueOf(positiveReadingVal).setScale(4, RoundingMode.CEILING);
-            ElectricityReading electricityReading = new ElectricityReading(now.minusSeconds(i * interval), reading);
+            ElectricityReading electricityReading = new ElectricityReading(startBackward.minusSeconds(i * interval), reading);
             readings.add(electricityReading);
         }
 

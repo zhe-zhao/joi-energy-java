@@ -24,6 +24,18 @@ public class PricePlanService {
         this.meterReadingService = meterReadingService;
     }
 
+    public Optional<Map<String, BigDecimal>> getPrevWeekConsumptionCostOfElectricityReadings(String smartMeterId) {
+        Optional<List<ElectricityReading>> electricityReadings = meterReadingService.getPrevNatualWeekReadings(smartMeterId);
+
+        if (!electricityReadings.isPresent()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(pricePlans.stream().collect(
+                Collectors.toMap(PricePlan::getPlanName, t -> calculateCost(electricityReadings.get(), t))
+        ));
+    }
+
     public Optional<Map<String, BigDecimal>> getConsumptionCostOfElectricityReadingsForEachPricePlan(String smartMeterId) {
         Optional<List<ElectricityReading>> electricityReadings = meterReadingService.getReadings(smartMeterId);
 
@@ -61,5 +73,4 @@ public class PricePlanService {
 
         return BigDecimal.valueOf(Duration.between(first.getTime(), last.getTime()).getSeconds() / 3600.0);
     }
-
 }

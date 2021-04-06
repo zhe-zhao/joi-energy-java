@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PricePlanComparatorControllerTest {
 
@@ -63,6 +64,28 @@ public class PricePlanComparatorControllerTest {
         expected.put(PricePlanComparatorController.PRICE_PLAN_ID_KEY, PRICE_PLAN_1_ID);
         expected.put(PricePlanComparatorController.PRICE_PLAN_COMPARISONS_KEY, expectedPricePlanToCost);
         assertThat(controller.calculatedCostForEachPricePlan(SMART_METER_ID).getBody()).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldCalculateCostForMeterReadingsInPrevNatualWeek() {
+        Instant now = Instant.now();
+        ElectricityReading readingCurrentWeek1 = new ElectricityReading(now.minusSeconds(3600), BigDecimal.valueOf(15.0));
+        ElectricityReading readingCurrentWeek2 = new ElectricityReading(now, BigDecimal.valueOf(5.0));
+        int secondsInOneWeek = 3600 * 24 * 7;
+        ElectricityReading readingPrevWeek1 = new ElectricityReading(now.minusSeconds(secondsInOneWeek), BigDecimal.valueOf(3.0));
+        ElectricityReading readingPrevWeek2 = new ElectricityReading(now.minusSeconds(secondsInOneWeek + 3600), BigDecimal.valueOf(5.0));
+        meterReadingService.storeReadings(SMART_METER_ID, Arrays.asList(readingCurrentWeek1, readingCurrentWeek2, readingPrevWeek1, readingPrevWeek2));
+
+        Map<String, BigDecimal> expectedPricePlanToCost = new HashMap<>();
+        expectedPricePlanToCost.put(PRICE_PLAN_1_ID, BigDecimal.valueOf(40.0).setScale(3));
+        expectedPricePlanToCost.put(PRICE_PLAN_2_ID, BigDecimal.valueOf(4.0).setScale(3));
+        expectedPricePlanToCost.put(PRICE_PLAN_3_ID, BigDecimal.valueOf(8.0).setScale(3));
+
+        Map<String, Object> expected = new HashMap<>();
+        expected.put(PricePlanComparatorController.PRICE_PLAN_ID_KEY, PRICE_PLAN_1_ID);
+        expected.put(PricePlanComparatorController.PRICE_PLAN_COMPARISONS_KEY, expectedPricePlanToCost);
+        assertThat(controller.calculatedPrevNatualWeekCostForEachPricePlan(SMART_METER_ID).getBody()).isEqualTo(expected);
+        assertEquals(expected, controller.calculatedPrevNatualWeekCostForEachPricePlan((SMART_METER_ID)).getBody());
     }
 
     @Test

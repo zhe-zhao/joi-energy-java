@@ -40,7 +40,7 @@ public class PricePlanService {
         BigDecimal timeElapsed = calculateTimeElapsed(electricityReadings);
 
         BigDecimal averagedCost = average.multiply(timeElapsed);
-        return averagedCost.multiply(pricePlan.getUnitRate());
+        return averagedCost.multiply(pricePlan.getUnitRate()).setScale(3, RoundingMode.HALF_UP);
     }
 
     private BigDecimal calculateAverageReading(List<ElectricityReading> electricityReadings) {
